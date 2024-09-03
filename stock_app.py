@@ -6,11 +6,14 @@ import pandas as pd
 from pandas import json_normalize
 from datetime import datetime, timedelta
 
+#set pandas options for better mobile viewing
+pd.set_option('display.max_colwidth', None)
+pd.set_option('display.max_columns', None)
+
 current_date = datetime.today()
 yesterday = (current_date - timedelta(days=1)).strftime("%Y-%m-%d")
 
 def get_stonk_data():
-    #url = 'https://tradestie.com/api/v1/apps/reddit?date=2022-04-03'
     url = f'https://tradestie.com/api/v1/apps/reddit?date={yesterday}'
     response = requests.get(url)
 
@@ -22,8 +25,26 @@ def get_stonk_data():
 
 stonks = get_stonk_data()
 
-df = json_normalize(stonks)
+if stonks:
+    df = json_normalize(stonks)
 
-#print(df)
+    #swaps the first and last columns for readability
+    cols = list(df.columns)
+    if len(cols) > 1:
+        cols[0], cols[-1] = cols[-1], cols[0]  # Swap the first and last columns
+        df = df[cols]
+    
+    df.iloc[:, 2] = (df.iloc[:, 2] * 100).round(2).astype(str) + "%"
+    
+    #function to apply alternating row colors
+    def highlight_rows(row):
+        return ['background-color: #f2f2f2' if row.name % 2 == 0 else '' for _ in row]
 
-st.table(df)
+    #applies styles to dataframe df
+    df_style = df.style.apply(highlight_rows, axis=1)
+    df_style = df_style.set_properties(**{'text-align': 'right'})
+
+    # Display the styled dataframe
+    st.dataframe(df_style)
+else:
+    st.write("No data available")
