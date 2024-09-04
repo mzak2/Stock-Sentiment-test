@@ -2,7 +2,7 @@
 
 A simple Streamlit app that uses a free API to analyze wallstreetbets top 50 mentioned stocks over a 24hr period
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]((https://stock-sentiment-test-bafhwkdutxbkgtss8qmapph.streamlit.app/))
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://stock-sentiment-test-bafhwkdutxbkgtss8qmapph.streamlit.app/)
 
 ### How to run it on your own machine
 
