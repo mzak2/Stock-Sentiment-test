@@ -1,8 +1,8 @@
-# 🎈 Blank app template
+# Stock-Sentiment-Test
 
-A simple Streamlit app template for you to modify!
+A simple Streamlit app that uses a free API to analyze wallstreetbets top 50 mentioned stocks over a 24hr period
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]((https://stock-sentiment-test-bafhwkdutxbkgtss8qmapph.streamlit.app/))
 
 ### How to run it on your own machine
 
@@ -15,5 +15,5 @@ A simple Streamlit app template for you to modify!
 2. Run the app
 
    ```
-   $ streamlit run streamlit_app.py
+   $ streamlit run stock_app.py
    ```
