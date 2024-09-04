@@ -5,45 +5,81 @@ import json
 import pandas as pd
 from pandas import json_normalize
 from datetime import datetime, timedelta
-from itables.streamlit import interactive_table
-
+#from itables.streamlit import interactive_table
 
 #set pandas options for better mobile viewing
 pd.set_option('display.max_colwidth', None)
 pd.set_option('display.max_columns', None)
 
-current_date = datetime.today()
-yesterday = (current_date - timedelta(days=1)).strftime("%Y-%m-%d")
+#current_date = datetime.today()
+#yesterday = (current_date - timedelta(days=1)).strftime("%Y-%m-%d")
+#today = datetime.today().strftime("%Y-%m-%d")
 
-def get_stonk_data():
-    url = f'https://tradestie.com/api/v1/apps/reddit?date={yesterday}'
-    response = requests.get(url)
+# Initialize session state for date if not already present
+if 'current_date' not in st.session_state:
+  st.session_state.current_date = datetime.today()
 
-    if response.status_code == 200:
-        data = response.json()
-        return data
+if st.session_state.current_date >= datetime.today():
+  st.session_state.current_date = datetime.today()
+
+def get_stonk_data(date):
+  if date >= datetime.today():
+    date = datetime.today()
+    
+  url = f'https://tradestie.com/api/v1/apps/reddit?date={date.strftime("%Y-%m-%d")}'
+  response = requests.get(url)
+
+  if response.status_code == 200:
+      data = response.json()
+      return data
+  else:
+      return None
+
+def display_table(stonks):
+  
+  st.header(f"Stock Data for: {st.session_state.current_date.strftime('%Y-%m-%d')}")
+  df = json_normalize(stonks)
+
+  #swaps the first and last columns for readability
+  cols = list(df.columns)
+  if len(cols) > 1:
+      cols[0], cols[-1] = cols[-1], cols[0]  # Swap the first and last columns
+      df = df[cols]
+  
+  df.iloc[:, 2] = (df.iloc[:, 2] * 100).round(2).astype(str) + "%"
+  
+  #function to apply alternating row colors
+  def highlight_rows(row):
+      return ['background-color: #f2f2f2' if row.name % 2 == 0 else '' for _ in row]
+
+  #interactive_table(df)
+  st.table(df)
+
+# Function to go to the previous day
+def prev_day_button():
+  if st.button("Previous Day"):
+      st.session_state.current_date -= timedelta(days=1)
+      st.experimental_rerun()
+
+def reset_button():
+  if st.button ("Reset Date"):
+    today = datetime.today()
+    st.session_state.current_date = today - timedelta(days=1)
+    st.experimental_rerun()
+
+def next_day_button():
+  if st.button("Next Day"):
+    if st.session_state.current_date >= datetime.today():
+      st.session_state.current_date == datetime.today()
     else:
-        return None
+      st.session_state.current_date += timedelta(days=1)
+      st.experimental_rerun()
 
-stonks = get_stonk_data()
+# Get the stock data for the current date in session state
+stonks = get_stonk_data(st.session_state.current_date)
+display_table(stonks)
 
-if stonks:
-    df = json_normalize(stonks)
-
-    #swaps the first and last columns for readability
-    cols = list(df.columns)
-    if len(cols) > 1:
-        cols[0], cols[-1] = cols[-1], cols[0]  # Swap the first and last columns
-        df = df[cols]
-    
-    df.iloc[:, 2] = (df.iloc[:, 2] * 100).round(2).astype(str) + "%"
-    
-    #function to apply alternating row colors
-    def highlight_rows(row):
-        return ['background-color: #f2f2f2' if row.name % 2 == 0 else '' for _ in row]
-
-    interactive_table(df)
-
-    
-else:
-    st.write("No data available")
+# Display the Previous Day button
+prev_day_button()
+reset_button()
+next_day_button()
