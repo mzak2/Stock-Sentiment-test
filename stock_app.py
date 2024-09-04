@@ -5,7 +5,7 @@ import json
 import pandas as pd
 from pandas import json_normalize
 from datetime import datetime, timedelta
-#from itables.streamlit import interactive_table
+from itables.streamlit import interactive_table
 
 #set pandas options for better mobile viewing
 pd.set_option('display.max_colwidth', None)
@@ -52,8 +52,8 @@ def display_table(stonks):
   def highlight_rows(row):
       return ['background-color: #f2f2f2' if row.name % 2 == 0 else '' for _ in row]
 
-  #interactive_table(df)
-  st.table(df)
+  interactive_table(df)
+  #st.table(df)
 
 # Function to go to the previous day
 def prev_day_button():
