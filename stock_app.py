@@ -70,7 +70,7 @@ def reset_button():
 def next_day_button():
   if st.button("Next Day"):
     if st.session_state.current_date >= datetime.today():
-      st.session_state.current_date == datetime.today()
+      st.session_state.current_date = datetime.today()
     else:
       st.session_state.current_date += timedelta(days=1)
       st.experimental_rerun()
