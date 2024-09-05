@@ -46,26 +46,22 @@ def display_table(stonks):
     
     interactive_table(df)
 
-# Function to go to the previous day
-def prev_day_button():
-    if st.button("Previous Day"):
-        st.session_state.current_date -= timedelta(days=1)
-        st.experimental_rerun()
+# Function to update date in session state without reruns
+def update_date(days_diff):
+    st.session_state.current_date += timedelta(days=days_diff)
 
-# Function to reset date to yesterday
-def reset_button():
+# Buttons to navigate through dates
+col1, col2, col3 = st.columns([1, 1, 1])
+with col1:
+    if st.button("Previous Day"):
+        update_date(-1)
+with col2:
     if st.button("Reset Date"):
         st.session_state.current_date = datetime.today() - timedelta(days=1)
-        st.experimental_rerun()
-
-# Function to go to the next day
-def next_day_button():
+with col3:
     if st.button("Next Day"):
-        if st.session_state.current_date >= datetime.today():
-            st.session_state.current_date = datetime.today()  # Fix assignment
-        else:
-            st.session_state.current_date += timedelta(days=1)
-        st.experimental_rerun()
+        if st.session_state.current_date < datetime.today():
+            update_date(1)
 
 # Get the stock data for the current date in session state
 stonks = get_stonk_data(st.session_state.current_date)
@@ -74,8 +70,3 @@ if stonks:
     display_table(stonks)
 else:
     st.error("No stock data available for this date.")
-
-# Display buttons
-prev_day_button()
-reset_button()
-next_day_button()
