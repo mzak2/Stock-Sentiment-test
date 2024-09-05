@@ -5,11 +5,12 @@ import json
 import pandas as pd
 from pandas import json_normalize
 from datetime import datetime, timedelta
-from itables.streamlit import interactive_table
+#from itables.streamlit import interactive_table
 
 # Set pandas options for better mobile viewing
 pd.set_option('display.max_colwidth', None)
 pd.set_option('display.max_columns', None)
+pd.set_option('colheader_justify', 'center')
 
 # Initialize session state for date if not already present
 if 'current_date' not in st.session_state:
@@ -31,11 +32,24 @@ def get_stonk_data(date):
         return data
     else:
         return None
-
+        
+        
+def strip_whitespace(df):
+  for col in df.select_dtypes(include=['object']):
+      df[col] = df[col].str.strip()
+  return df
+  
 def display_table(stonks):
     st.header(f"Stock Data for: {st.session_state.current_date.strftime('%Y-%m-%d')}")
-    df = json_normalize(stonks)
-
+    #df = json_normalize(stonks)
+    df = pd.DataFrame(stonks)
+    
+    df = df.rename(columns={
+      "no_of_comments": "comments"
+    })
+    
+    strip_whitespace(df)
+    
     # Swaps the first and last columns for readability
     cols = list(df.columns)
     if len(cols) > 1:
@@ -44,7 +58,11 @@ def display_table(stonks):
     
     df.iloc[:, 2] = (df.iloc[:, 2] * 100).round(2).astype(str) + "%"
     
-    interactive_table(df)
+    #df = df.drop(df.columns[0], axis=1)
+    #df = df.reset_index(drop=True)
+    
+    #interactive_table(df)
+    st.dataframe(df, use_container_width=True)
 
 # Function to update date in session state without reruns
 def update_date(days_diff):
